@@ -13,15 +13,22 @@ var bruteCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		output, err := internal.Bruteforce(args[0], args[1])
+		result, err := internal.Bruteforce(args[0], args[1])
 		if err != nil {
 			return err
 		}
-		if output == "" {
-			fmt.Println("Secret not found:")
-		} else {
-			fmt.Println("Secret found: " + output)
+
+		var triesPerSec float64
+		if result.Duration.Seconds() > 0 {
+			triesPerSec = float64(result.Tried) / result.Duration.Seconds()
 		}
+
+		if result.Secret == "" {
+			fmt.Println("Secret not found")
+		} else {
+			fmt.Println("Secret found: " + result.Secret)
+		}
+		fmt.Printf("Tried %d secrets in %s (%.2f tries/s)\n", result.Tried, result.Duration, triesPerSec)
 
 		return nil
 	},
