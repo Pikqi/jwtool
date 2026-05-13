@@ -1,0 +1,5 @@
+secret
+password
+weak_secret
+test123
+your-256-bit-secret
