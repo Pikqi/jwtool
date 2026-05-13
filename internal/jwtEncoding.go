@@ -8,8 +8,14 @@ import (
 	"strings"
 )
 
-func ParseClaimsJson(_jwt string) (string, error) {
+const (
+	colorOrange = "\033[38;5;208m"
+	colorPurple = "\033[13;5;95m"
+	colorGreen  = "\033[32m"
+	colorReset  = "\033[0m"
+)
 
+func FormatJWT(_jwt string, color bool) (string, error) {
 	jwt := strings.TrimSpace(_jwt)
 
 	parts := strings.Split(jwt, ".")
@@ -37,6 +43,22 @@ func ParseClaimsJson(_jwt string) (string, error) {
 		return "", errors.New("invalid JWT: claims is not valid JSON")
 	}
 
-	result := "Header:\n" + headerBuf.String() + "\n\nClaims:\n" + claimsBuf.String()
+	var coloredJWT string
+	if color {
+		coloredJWT = colorOrange + parts[0] + colorReset + "." + colorPurple + parts[1] + colorReset + "." + colorGreen + parts[2] + colorReset
+	} else {
+		coloredJWT = jwt
+	}
+
+	result := ""
+	if color {
+		result = coloredJWT + "\n\nHeader:\n" + colorOrange + headerBuf.String() + colorReset +
+			"\n\nClaims:\n" + colorPurple + claimsBuf.String() + colorReset
+	} else {
+		result = coloredJWT + "\n\nHeader:\n" + headerBuf.String() +
+			"\n\nClaims:\n" + claimsBuf.String()
+
+	}
+
 	return result, nil
 }

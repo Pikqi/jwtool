@@ -32,5 +32,5 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("color", "t", true, "Toggle color mode")
+	rootCmd.PersistentFlags().BoolP("color", "c", true, "Toggle color mode")
 }

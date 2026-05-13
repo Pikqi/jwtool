@@ -12,12 +12,16 @@ var readCmd = &cobra.Command{
 	Short: "See formatted JSON payload and header",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		claims, err := internal.ParseClaimsJson(args[0])
+		color, err := cmd.Flags().GetBool("color")
 		if err != nil {
 			return err
 		}
-		fmt.Println(claims)
+
+		output, err := internal.FormatJWT(args[0], color)
+		if err != nil {
+			return err
+		}
+		fmt.Println(output)
 
 		return nil
 	},
