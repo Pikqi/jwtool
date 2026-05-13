@@ -15,6 +15,32 @@ const (
 	colorReset  = "\033[0m"
 )
 
+type JWTHeader struct {
+	Alg string `json:"alg"`
+	Typ string `json:"typ"`
+}
+
+func ParseJWTHeader(_jwt string) (JWTHeader, error) {
+	jwt := strings.TrimSpace(_jwt)
+
+	parts := strings.Split(jwt, ".")
+	if len(parts) != 3 {
+		return JWTHeader{}, errors.New("invalid JWT: expected 3 parts separated by '.'")
+	}
+
+	headerBytes, err := base64.RawURLEncoding.DecodeString(parts[0])
+	if err != nil {
+		return JWTHeader{}, errors.New("invalid JWT: failed to decode header")
+	}
+
+	var header JWTHeader
+	if err := json.Unmarshal(headerBytes, &header); err != nil {
+		return JWTHeader{}, errors.New("invalid JWT: header is not valid JSON")
+	}
+
+	return header, nil
+}
+
 func FormatJWT(_jwt string, color bool) (string, error) {
 	jwt := strings.TrimSpace(_jwt)
 

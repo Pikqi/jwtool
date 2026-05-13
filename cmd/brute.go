@@ -12,11 +12,12 @@ var bruteCmd = &cobra.Command{
 	Short: "Brute force a JWT",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-
 		result, err := internal.Bruteforce(args[0], args[1])
 		if err != nil {
 			return err
 		}
+
+		fmt.Printf("Algorithm: %s\n", result.Alg)
 
 		var triesPerSec float64
 		if result.Duration.Seconds() > 0 {

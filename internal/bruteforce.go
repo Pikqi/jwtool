@@ -5,8 +5,11 @@ import (
 	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/base64"
 	"errors"
+	"fmt"
+	"hash"
 	"os"
 	"strings"
 	"time"
@@ -16,11 +19,28 @@ type BruteforceResult struct {
 	Secret   string
 	Tried    int
 	Duration time.Duration
+	Alg      string
 }
 
-// TODO: check alg
 func Bruteforce(_jwt string, wordlist_path string) (BruteforceResult, error) {
 	jwt := strings.TrimSpace(_jwt)
+
+	header, err := ParseJWTHeader(_jwt)
+	if err != nil {
+		return BruteforceResult{}, err
+	}
+
+	var h func() hash.Hash
+	switch header.Alg {
+	case "HS256":
+		h = sha256.New
+	case "HS384":
+		h = sha512.New384
+	case "HS512":
+		h = sha512.New
+	default:
+		return BruteforceResult{}, fmt.Errorf("algorithm %s is not supported for brute-forcing", header.Alg)
+	}
 
 	parts := strings.Split(jwt, ".")
 	if len(parts) != 3 {
@@ -48,7 +68,7 @@ func Bruteforce(_jwt string, wordlist_path string) (BruteforceResult, error) {
 		possible_secret := scanner.Text()
 		tried++
 
-		mac := hmac.New(sha256.New, []byte(possible_secret))
+		mac := hmac.New(h, []byte(possible_secret))
 		mac.Write(bytes_to_sign)
 		possible_signed_bytes := mac.Sum(nil)
 
@@ -57,6 +77,7 @@ func Bruteforce(_jwt string, wordlist_path string) (BruteforceResult, error) {
 				Secret:   possible_secret,
 				Tried:    tried,
 				Duration: time.Since(start),
+				Alg:      header.Alg,
 			}, nil
 		}
 	}
@@ -65,5 +86,6 @@ func Bruteforce(_jwt string, wordlist_path string) (BruteforceResult, error) {
 		Secret:   "",
 		Tried:    tried,
 		Duration: time.Since(start),
+		Alg:      header.Alg,
 	}, nil
 }
