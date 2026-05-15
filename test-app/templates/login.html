@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white text-center">
+        <h4 class="mb-0"> JWT Vulnerability Lab</h4>
+        <small class="text-muted">Educational Security Testing Environment</small>
+      </div>
+      <div class="card-body">
+        <!-- Purpose Warning -->
+        <div class="alert alert-info border-0">
+          <strong> Educational Purpose Only:</strong> This app intentionally contains multiple JWT flaws for safe, legal exploitation practice in a controlled lab.
+        </div>
+
+        <!-- Vulnerabilities -->
+        <div class="mb-3">
+          <h6> Vulnerabilities to Test:</h6>
+          <ul class="list-unstyled mb-0">
+            <li> <strong>Weak Secret:</strong> Signed with <code>weak_secret</code> → test <code>./jwtool brute</code></li>
+            <li> <strong>Algorithm None:</strong> Backend trusts <code>alg: "none"</code> → test <code>./jwtool none</code></li>
+            <li> <strong>Algorithm Confusion:</strong> RS256→HS256 switch → test <code>./jwtool confusion</code></li>
+            <li> <strong>Empty Signature:</strong> Accepts trailing <code>.</code> → test <code>./jwtool none -e</code></li>
+          </ul>
+        </div>
+
+        <!-- Workflow -->
+        <div class="mb-4">
+          <h6>🛠️ Demo Workflow:</h6>
+          <ol class="small text-muted mb-0">
+            <li>Login below to receive a valid JWT cookie</li>
+            <li>Copy the token from the Dashboard</li>
+            <li>Forge it with your CLI tool</li>
+            <li>Paste the result in <a href="/debug" class="text-primary">/debug</a> to verify bypass</li>
+          </ol>
+        </div>
+
+        <hr class="my-3">
+
+        <form method="POST">
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" name="username" class="form-control" required placeholder="Try: admin or user">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" required placeholder="Any password works">
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Login & Get JWT</button>
+        </form>
+        <div class="text-center mt-2">
+          <small class="text-muted">No real auth • Tokens stored in cookies for testing</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

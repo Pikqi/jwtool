@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}JWT Debugger{% endblock %}
+{% block content %}
+<div class="card shadow">
+  <div class="card-header bg-warning text-dark"> JWT Inspector</div>
+  <div class="card-body">
+    <form method="GET" action="/debug">
+      <div class="mb-3">
+        <label class="form-label">Paste JWT</label>
+        <textarea name="token" class="form-control font-monospace" rows="3" placeholder="eyJhbGci...">{{ result.raw }}</textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Decode & Verify</button>
+    </form>
+    {% if result.raw %}
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <h6>Header</h6>
+        <pre>{{ result.header | tojson(indent=2) }}</pre>
+      </div>
+      <div class="col-md-6">
+        <h6>Payload</h6>
+        <pre>{{ result.payload | tojson(indent=2) }}</pre>
+      </div>
+    </div>
+    <div class="alert {{ 'success' if 'Verified' in result.status else 'danger' }} mt-3">
+      {{ result.status }}
+      {% if result.verified_payload %}
+      <hr>
+      <strong>Decoded Claims:</strong>
+      <pre>{{ result.verified_payload | tojson(indent=2) }}</pre>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

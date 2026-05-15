@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-6">
+    <div class="card shadow mb-3">
+      <div class="card-header bg-success text-white"> Session Info</div>
+      <div class="card-body">
+        <p><strong>Status:</strong> {{ msg }}</p>
+        <p><strong>Username:</strong> {{ payload.sub }}</p>
+        <p><strong>Role:</strong> <span class="badge bg-{{ 'danger' if payload.role == 'admin' else 'secondary' }}">{{ payload.role }}</span></p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow mb-3">
+      <div class="card-header bg-dark text-white">🔑 Current JWT</div>
+      <div class="card-body">
+        <code class="token-box">{{ token }}</code>
+        <div class="mt-2">
+          <a href="/debug?token={{ token }}" class="btn btn-sm btn-outline-info">Inspect in Debugger</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
