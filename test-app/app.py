@@ -51,13 +51,29 @@ def verify_jwt_vulnerable(token: str):
         try:
             if os.path.exists(PUBLIC_KEY_PATH):
                 with open(PUBLIC_KEY_PATH, "r") as f:
-                    pubkey_as_secret = f.read()
-                payload = jwt.decode(token, key=pubkey_as_secret, algorithms=["HS256"])
-                return payload, "Verified: HS256 with public key as secret (Algorithm confusion)"
-        except jwt.InvalidSignatureError:
-            pass
+                    pubkey_as_secret = f.read().encode()  
+
+                import hmac as hmaclib
+                import hashlib
+
+                parts = token.split(".")
+                signing_input = (parts[0] + "." + parts[1]).encode()
+                
+                sig_b64 = parts[2]
+
+                sig_b64 += "=" * (4 - len(sig_b64) % 4)
+                expected_sig = base64.urlsafe_b64decode(sig_b64)
+
+                actual_sig = hmaclib.new(pubkey_as_secret, signing_input, hashlib.sha256).digest()
+
+                if hmaclib.compare_digest(actual_sig, expected_sig):
+                    payload_b64 = parts[1] + "=" * (4 - len(parts[1]) % 4)
+                    payload = json.loads(base64.urlsafe_b64decode(payload_b64))
+                    return payload, "Verified: HS256 with public key as secret (Algorithm confusion)"
+                else:
+                    return None, "HS256 verification failed: invalid signature"
         except Exception as e:
-            return None, f" HS256 verification failed: {e}"
+            return None, f"HS256 verification failed: {e}"
         
     # standardni hs256 (bruteforce)
     try:

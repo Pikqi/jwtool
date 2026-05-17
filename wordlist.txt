@@ -3,3 +3,5 @@ password
 weak_secret
 test123
 your-256-bit-secret
+123456
+admin

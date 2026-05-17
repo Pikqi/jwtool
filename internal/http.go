@@ -22,7 +22,12 @@ type AttackResult struct {
 func SendWithJWT(url, token string, opts SendOpts) (AttackResult, error) {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
+			if len(via) > 0 {
+				for _, cookie := range via[0].Cookies() {
+					req.AddCookie(cookie)
+				}
+			}
+			return nil
 		},
 	}
 
